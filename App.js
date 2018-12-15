@@ -22,6 +22,14 @@ const Header = ({message}) => (
   </View>
 );
 
+const Playback_Controller = (
+  <View style={styles.HeaderView}>
+    <TouchableOpacity>
+      <Image source={require('./images/play_Button.png')} style={styles.HeaderButton}/>
+    </TouchableOpacity>
+  </View>
+);
+
 export default class App extends Component {
   render() {
     return (
@@ -29,7 +37,8 @@ export default class App extends Component {
         <Header message="My Music Player"/>
         <View>
           <Text style={{fontSize: 15}}>summery</Text>
-        </View>
+        </View>      
+        <Playback_Controller/>
       </View>
     );
   }
@@ -60,6 +69,20 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     resizeMode: 'contain',
-  }
+  },
+
+  PB_ControllerView: {
+    flexDirection : 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#D3D3D3',
+    padding: 10,
+  },
+
+  PlayButton: {
+
+  },
+
+  
 
 });
