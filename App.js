@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {StyleSheet, TouchableOpacity, Image, Text, View, Dimensions} from 'react-native';
-//import Sound from 'react-native-sound';
 import Slider from 'react-native-slider';
+import Video from 'react-native-video';
 
 const Header = ({message}) => (
   <View style={styles.HeaderView}>
@@ -86,7 +86,7 @@ const SeekBar = ({trackLength, currentPosition, onSeek, onSlidingStart}) => {
 
 
 const Controls = ({paused, shuffleOn, repeatOn, onPressPlay, onPressPause, onBack, onForward, onPressShuffle, onPressRepeat, forwardDisabled}) => (
-  <View style={{flexDirection : 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#D3D3D3', paddingHorizontal: 20, height: height / 9}}>
+  <View style={{flexDirection : 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#D3D3D3', paddingHorizontal: 20, height: height / 8}}>
     <TouchableOpacity activeOpacity={0.0} onPress={onPressShuffle}>
       <Image style={[{width: 35, resizeMode: 'contain'} || styles.secondaryControl, shuffleOn ? [] : styles.off]}
         source={require('./images/shuffle_Button.png')}/>
@@ -118,15 +118,138 @@ const Controls = ({paused, shuffleOn, repeatOn, onPressPlay, onPressPause, onBac
   </View>
 );
 
+export const TRACKS = [
+  {
+    title: 'Lemonade',
+    artist: 'Jeremy Passion',
+    albumArtUrl: "https://image.genie.co.kr/Y/IMAGE/IMG_ALBUM/080/881/738/80881738_1476255160695_1_600x600.JPG",
+    audioUrl: require('./music/lemonade.mp4'),
+  },
+  {
+    title: 'Love Yourself',
+    artist: 'Justin Bieber',
+    albumArtUrl: "http://arrestedmotion.com/wp-content/uploads/2015/10/JB_Purpose-digital-deluxe-album-cover_lr.jpg",
+    audioUrl: 'http://oranslectio.files.wordpress.com/2013/12/39-15-mozart_-adagio-fugue-in-c-minor-k-546.mp3',
+  },
+  {
+    title: 'Hotline Bling',
+    artist: 'Drake',
+    albumArtUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Drake_-_Hotline_Bling.png',
+    audioUrl: 'http://russprince.com/hobbies/files/13%20Beethoven%20-%20Fur%20Elise.mp3',
+  },
+];
+
 export default class App extends Component {
   render() {
+    return <Player tracks={TRACKS} />
+  }
+}
+
+class Player extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      paused: false,
+      totalLength: 1,
+      currentPosition: 0,
+      selectedTrack: 0,
+      repeatOn: false,
+      shuffleOn: false,
+    };
+  }
+
+  setDuration(data) {
+    // console.log(totalLength);
+    this.setState({totalLength: Math.floor(data.duration)});
+  }
+
+  setTime(data) {
+    //console.log(data);
+    this.setState({currentPosition: Math.floor(data.currentTime)});
+  }
+
+  seek(time) {
+    time = Math.round(time);
+    this.refs.audioElement && this.refs.audioElement.seek(time);
+    this.setState({
+      currentPosition: time,
+      paused: false,
+    });
+  }
+
+  onBack() {
+    if (this.state.currentPosition < 10 && this.state.selectedTrack > 0) {
+      this.refs.audioElement && this.refs.audioElement.seek(0);
+      this.setState({ isChanging: true });
+      setTimeout(() => this.setState({
+        currentPosition: 0,
+        paused: false,
+        totalLength: 1,
+        isChanging: false,
+        selectedTrack: this.state.selectedTrack - 1,
+      }), 0);
+    } else {
+      this.refs.audioElement.seek(0);
+      this.setState({
+        currentPosition: 0,
+      });
+    }
+  }
+
+  onForward() {
+    if (this.state.selectedTrack < this.props.tracks.length - 1) {
+      this.refs.audioElement && this.refs.audioElement.seek(0);
+      this.setState({ isChanging: true });
+      setTimeout(() => this.setState({
+        currentPosition: 0,
+        totalLength: 1,
+        paused: false,
+        isChanging: false,
+        selectedTrack: this.state.selectedTrack + 1,
+      }), 0);
+    }
+  }
+
+
+  render() {
+    const track = this.props.tracks[this.state.selectedTrack];
+    const video = this.state.isChanging ? null : (
+      <Video source={track.audioUrl} // Can be a URL or a local file.
+        ref="audioElement"
+        paused={this.state.paused}               // Pauses playback entirely.
+        resizeMode="cover"           // Fill the whole screen at aspect ratio.
+        repeat={true}                // Repeat forever.
+        onLoadStart={this.loadStart} // Callback when video starts to load
+        onLoad={this.setDuration.bind(this)}    // Callback when video loads
+        onProgress={this.setTime.bind(this)}    // Callback every ~250ms with currentTime
+        onEnd={this.onEnd}           // Callback when playback finishes
+        onError={this.videoError}    // Callback when video cannot be loaded
+        style={styles.audioElement} />
+    );
+    
     return (
       <View style={styles.container}>
-        <Header message="My Music Player"/>
-        <AlbumArt url="http://36.media.tumblr.com/14e9a12cd4dca7a3c3c4fe178b607d27/tumblr_nlott6SmIh1ta3rfmo1_1280.jpg" />
-        <TrackInfo title="Stressed Out" artist="Twenty One Pilots"/>
-        <SeekBar trackLength={204} currentPosition={156} />
-        <Controls />
+        <Header message="My Music Player" />
+        <AlbumArt url={track.albumArtUrl} />
+        <TrackInfo title={track.title} artist={track.artist} />
+        <SeekBar
+          onSeek={this.seek.bind(this)}
+          trackLength={this.state.totalLength}
+          onSlidingStart={() => this.setState({paused: true})}
+          currentPosition={this.state.currentPosition} />
+        <Controls
+          onPressRepeat={() => this.setState({repeatOn: !this.state.repeatOn})}
+          repeatOn={this.state.repeatOn}
+          shuffleOn={this.state.shuffleOn}
+          forwardDisabled={this.state.selectedTrack == this.props.tracks.length - 1}
+          onPressShuffle={() => this.setState({shuffleOn: !this.state.shuffleOn})}
+          onPressPlay={() => this.setState({paused: false})}
+          onPressPause={() => this.setState({paused: true})}
+          onBack={this.onBack.bind(this)}
+          onForward={this.onForward.bind(this)}
+          paused={this.state.paused}/>
+        {video}
       </View>
     );
   }
@@ -137,14 +260,14 @@ const styles = StyleSheet.create({
     flex: 1,
 //    justifyContent: 'center',
 //    alignItems: 'center',
-    backgroundColor: '#13133a',
+    backgroundColor: '#1f1f60',
   },
   HeaderView: {
     flexDirection : 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#D3D3D3',
-    padding: 10,
+    paddingHorizontal: 10,
   },
   HeaderFont: {
     fontSize: 20,
@@ -198,7 +321,11 @@ const styles = StyleSheet.create({
   },
 
   PlayButton: {
-    height: 70,
+    height: 75,
     resizeMode: 'contain',
+  },
+  audioElement: {
+    height: 0,
+    width: 0,
   },
 });
