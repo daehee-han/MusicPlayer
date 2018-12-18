@@ -87,7 +87,7 @@ class Player extends Component {
 
   render() {
     const track = this.props.tracks[this.state.selectedTrack];
-    const Audio = new Sound(url=require('../music/lemonade.mp3'));
+    const Audio = new Sound(url=require('../music/lemonade.mp3')); //Track url 문제 때문에 App도 src파일로 이동시킬 필요가 있음
     // const video = this.state.isChanging ? null : (
     //   <Video source={track.audioUrl} // Can be a URL or a local file.
     //     ref="audioElement"
@@ -121,7 +121,7 @@ class Player extends Component {
           onPressShuffle={() => this.setState({shuffleOn: !this.state.shuffleOn})}
           onPressPlay={() => this.setState({paused: false})} //this.playSound(track)}
           onPressPause={() => this.setState({paused: true})}
-          onBack={() => Audio.play()}// this.onBack.bind(this)}
+          onBack={() => this.onBack.bind(this)}
           onForward={this.onForward.bind(this)}
           paused={this.state.paused}/>
       </View>
