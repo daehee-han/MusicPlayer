@@ -7,7 +7,7 @@ export const TRACKS = [
     title: 'Lemonade',
     artist: 'Jeremy Passion',
     albumArtUrl: "https://image.genie.co.kr/Y/IMAGE/IMG_ALBUM/080/881/738/80881738_1476255160695_1_600x600.JPG",
-    audioUrl: require('./music/lemonade.mp4'),
+    audioUrl: require('./music/lemonade.mp3'),
   },
   {
     title: 'Love Yourself',
@@ -20,6 +20,18 @@ export const TRACKS = [
     artist: 'Drake',
     albumArtUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Drake_-_Hotline_Bling.png',
     audioUrl: 'http://russprince.com/hobbies/files/13%20Beethoven%20-%20Fur%20Elise.mp3',
+  },
+  {
+  title: 'Janet',
+  artist: 'Berhana',
+  albumArtUrl: 'https://images.genius.com/77812beb5db4ced6d941893762da250e.1000x1000x1.jpg',
+  audioUrl: 'http://russprince.com/hobbies/files/13%20Beethoven%20-%20Fur%20Elise.mp3',
+  },
+  {
+  title: '안되나요',
+  artist: '휘성',
+  albumArtUrl: 'https://i.ytimg.com/vi/WCQF8Ol3-zI/hqdefault.jpg',
+  audioUrl: 'http://russprince.com/hobbies/files/13%20Beethoven%20-%20Fur%20Elise.mp3',
   },
 ];
 

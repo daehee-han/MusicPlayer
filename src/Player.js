@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import {StyleSheet, TouchableOpacity, Image, Text, View, Dimensions} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import Sound from 'react-native-sound'
 import Header from './Header'
 import AlbumArt from './AlbumArt'
 import TrackInfo from './TrackInfo'
 import SeekBar from './SeekBar'
 import Controls from './Controls'
-
 
 class Player extends Component {
   constructor(props) {
@@ -73,9 +73,21 @@ class Player extends Component {
     }
   }
 
+  playSound(track) {
+    this.Audio = new Sound(track.audioUrl, Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.log('failed to load the sound', error);
+        return;
+      }
+
+      this.Audio.play();
+      // console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+    });
+  }
 
   render() {
     const track = this.props.tracks[this.state.selectedTrack];
+    const Audio = new Sound(url=require('../music/lemonade.mp3'));
     // const video = this.state.isChanging ? null : (
     //   <Video source={track.audioUrl} // Can be a URL or a local file.
     //     ref="audioElement"
@@ -89,6 +101,7 @@ class Player extends Component {
     //     onError={this.videoError}    // Callback when video cannot be loaded
     //     style={styles.audioElement} />
     // );
+    
     
     return (
       <View style={styles.container}>
@@ -106,9 +119,9 @@ class Player extends Component {
           shuffleOn={this.state.shuffleOn}
           forwardDisabled={this.state.selectedTrack == this.props.tracks.length - 1}
           onPressShuffle={() => this.setState({shuffleOn: !this.state.shuffleOn})}
-          onPressPlay={() => this.setState({paused: false})}
+          onPressPlay={() => this.setState({paused: false})} //this.playSound(track)}
           onPressPause={() => this.setState({paused: true})}
-          onBack={this.onBack.bind(this)}
+          onBack={() => Audio.play()}// this.onBack.bind(this)}
           onForward={this.onForward.bind(this)}
           paused={this.state.paused}/>
       </View>
